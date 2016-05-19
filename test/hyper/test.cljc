@@ -1,8 +1,8 @@
-(ns ^:figwheel-always hyper.test
+(ns hyper.test
   (:require 
     [cljs.test :refer-macros [deftest is testing run-tests]]
     [cljs.pprint :as pprint]
-    [hyper.terse :refer-macros [html ? ..! js-iter]]
+    [hyper.terse :refer-macros [html]]
     [hyper.tools :as t]
     [hyper.js :as j]))
 
@@ -53,5 +53,18 @@
       (t/dissoc-keys {:a 1 :b 2 :c 3 :d 4} [:b :c]))) )
 
 
+
+; JS
+
+(deftest js-utility
+
+  (is (= '(false true false nil false) 
+    (map j/element? [js/document (.-body js/document) js/window nil #{}])))
+
+  (is (= '("joe" "joe" nil "6")
+    (map j/kw->str [:joe "joe" nil 6])
+
+
+)))
 
 (run-tests)

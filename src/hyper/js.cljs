@@ -1,23 +1,30 @@
-(ns hyper.js
+(ns ^:figwheel-always 
+  hyper.js
+  (:require-macros [hyper.macros :refer [js-iter]])
   (:require 
-    [hyper.terse :refer-macros [js-iter]]
     [goog.style :as gs]))
 
-'(predicates)
+;(predicates)
 
-(defn element? [el] (= (.-nodeType el) 1))
+(defn element? [el] (if el (= (.-nodeType el) 1) false))
 
-'(utils)
+;(utils)
 
 (defn abs [n] (.abs js/Math n))
 
-(defn log [v] (.log js/console v))
+(defn log 
+  ([a] (.log js/console a))
+  ([a b] (.log js/console a b))
+  ([a b c] (.log js/console a b c))
+  ([a b c d] (.log js/console a b c d))
+  ([a b c d e] (.log js/console a b c d e))
+  ([a b c d e f] (.log js/console a b c d e f)))
 
 (defn put-local [k v] (.setItem (aget  js/window "localStorage") k v))
 
 (defn get-local [k] (.getItem (aget  js/window "localStorage") k ))
 
-(defn kw->str [k] (or (.-name k) (str k)))
+(defn kw->str [k] (when k (or (.-name k) (str k))))
 
 (def ^:private js+2 (js* "function(a, b){return a + b;}"))
 (defn js+ ([a] a) 
@@ -33,14 +40,14 @@
 (def html-encode (js*
 "function htmlEncode( html ) {
     return document.createElement( 'a' ).appendChild( 
-        document.createTextNode( html ) ).parentNode.innerHTML;};"))
+        document.createTextNode( html ) ).parentNode.innerHTML;}"))
 
 (def html-decode (js*
 "function htmlDecode( html ) {
     var a = document.createElement( 'a' ); a.innerHTML = html;
-    return a.textContent;"))
+    return a.textContent;}"))
 
-'(objects)
+;(objects)
 
 (defn remove! [o k] (goog.object.remove o k))
 
@@ -55,7 +62,7 @@
 
 
 
-'(arrays)
+;(arrays)
 
 (defn array-remove [o v]
   (let [i (.indexOf o v)]
@@ -66,10 +73,10 @@
     (if (= -1 i) (.push o v))))
 
 (defn array-concat [v o]
-  (.apply (.. js/Array -prototype -concat) v, o))
+  (.apply (.. js/Array -prototype -concat) v o))
 
 
-'(style)
+;style
 
 (defn camel-style 
   ([s] (camel-style (.createElement js/document "div") s))
@@ -83,7 +90,7 @@
             (if (= (.-ownerNode sheet) el) sheet))]
       (first (remove nil? res)))))
 
-'(fanciful)
+;fancy
 
 (defn ajax [url f & fail]
   (when-let [req (new js/XMLHttpRequest)]
@@ -94,25 +101,32 @@
             (f (.. e -target -response))
             (when (fn? (first fail)) ((first fail) e))))))
     (.open req "GET" url false)
-    ;(.overrideMimeType req "text/xml; charset=iso-8859-1")
+    (.overrideMimeType req "text/xml; charset=iso-8859-1")
     (.send req)))
 
+(defn download-file [s file-name file-type]
+  (let [a (.createElement js/document "a")]
+    (set! (.-href a) (.createObjectURL js/URL (js/Blob. #js [s] #js {:type file-type})))
+    (set! (.-download a) file-name)
+    (.click a)))
 
-#_(defn resize-dataurl [data width height]
-  (let [img (first ($ (str "<img src='" data "'>")))
-        thumb (.createElement js/document "img")
-        canvas (first ($ (str "<canvas width='" width "' height='" height "'></canvas>")))
-        ctx (.getContext canvas "2d")]
+(defn resize-dataurl [data width height]
+  (let [img     (.createElement js/document "img")
+        canvas  (.createElement js/document "canvas")
+        ctx     (.getContext canvas "2d")]
+    (set! (.-data img) data)
+    (set! (.-width canvas) width)
+    (set! (.-height canvas) height)
     (.drawImage ctx img 0 0 width height)
-    (set! (.-src thumb) (.toDataURL canvas "image/png"))
-    ($/append (.-body js/document) thumb)
     (.toDataURL canvas "image/png")))
 
 
 (defn file-drop-event [e read-k f]
   (let [files (js->clj (.-files (.-dataTransfer e)))
         length (.-length files)]
-    (dorun (for [i (range 0 length) :let [file (aget files i)]]
+    (dorun (for 
+      [i (range 0 length) 
+      :let [file (aget files i)]]
       (let [reader (new js/FileReader)]
         (aset reader "onload" f)
         (case read-k

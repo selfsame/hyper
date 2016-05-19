@@ -1,4 +1,4 @@
-(ns hyper.tools)
+(ns ^:figwheel-always hyper.tools)
 
 '(predicates)
 

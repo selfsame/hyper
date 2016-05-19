@@ -1,9 +1,14 @@
 (ns hyper.terse
-  (:require-macros [hyper.terse :refer [html]]))
+  (:require-macros [hyper.terse :refer [html]])
+  (:require))
 
 (def PRIVATE (js/Object.))
 
-(defn owner-key [owner] (.. owner -_reactInternalInstance -_rootNodeID))
+(defn owner-key [owner]
+  (or 
+    (.. owner -_reactInternalInstance -_renderedComponent -_rootNodeID)
+    (.. owner -props -omcljs$reactKey)
+    (hash owner)))
 
 (defn private! [owner korks f]
   (let [func (if (= (type #()) (type f)) f (fn [v] f))
