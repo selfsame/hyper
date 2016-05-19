@@ -4,11 +4,7 @@
 
 (def PRIVATE (js/Object.))
 
-(defn owner-key [owner]
-  (or 
-    (.. owner -_reactInternalInstance -_renderedComponent -_rootNodeID)
-    (.. owner -props -omcljs$reactKey)
-    (hash owner)))
+(defn owner-key [owner] (hash owner))
 
 (defn private! [owner korks f]
   (let [func (if (= (type #()) (type f)) f (fn [v] f))
