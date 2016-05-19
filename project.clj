@@ -1,5 +1,5 @@
 (defproject selfsame/hyper "0.3.3-SNAPSHOT"
-  :description "cljs utilility."
+  :description "om.next utils for terse markup."
   :url "http://github.com/selfsame/hyper"
   :license {:name "The MIT License (MIT)"
             :url "https://github.com/selfsame/pdfn/blob/master/LICENSE"}
@@ -16,8 +16,10 @@
   :cljsbuild {
     :builds [{:id "dev"
               :source-paths ["src" "test"]
+              :figwheel {}
               :compiler {:main hyper.terse
                          :asset-path "js/compiled/out"
                          :output-to "resources/public/js/compiled/main.js"
                          :output-dir "resources/public/js/compiled/out"
-                         :source-map-timestamp true }}]})
+                         :source-map-timestamp true }}]}
+  :figwheel {:load-warninged-code true})
