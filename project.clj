@@ -1,4 +1,4 @@
-(defproject selfsame/hyper "0.3.1-SNAPSHOT"
+(defproject selfsame/hyper "0.3.2-SNAPSHOT"
   :description "om.next utils for terse markup."
   :url "http://github.com/selfsame/hyper"
   :license {:name "The MIT License (MIT)"
