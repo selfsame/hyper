@@ -66,7 +66,7 @@
   (let [forms (html-recur body)]
     `~(if (= 1 (count forms))
           (first forms)
-          (concat ['om.dom/div (js-obj)] forms))))
+          (concat ['om.dom/div '(js-obj)] forms))))
 
 '(fun stuff)
 
